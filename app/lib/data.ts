@@ -9,19 +9,24 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
-export async function fetchRevenue() {
+export async function fetchRevenue(): Promise<Revenue[]> {
   try {
-    // Artificially delay a response for demo purposes.
-    // Don't do this in production :)
-
     console.log('Fetching revenue data...');
+    
+    // Artificially delay a response for demo purposes.
     await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    const data = await sql`SELECT * FROM revenue`;
+    const data = await sql`SELECT month, revenue FROM revenue`; // Ensure your query selects the correct columns
 
     console.log('Data fetch completed after 3 seconds.', data.rows);
 
-    return data.rows;
+    // Map the rows to the Revenue interface
+    const revenue: Revenue[] = data.rows.map((row) => ({
+      month: row.month,    // Ensure this key matches your table's column name
+      revenue: row.revenue  // Ensure this key matches your table's column name
+    }));
+
+    return revenue; // Return the mapped array
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch revenue data.');
